@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/shared/Navbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,13 +29,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={cn(
-        "h-full antialiased",
-        inter.variable,
-        cormorant.variable
-      )}
+      className={cn("h-full antialiased", inter.variable, cormorant.variable)}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+        <Navbar />
         {children}
       </body>
     </html>
