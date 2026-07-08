@@ -3,6 +3,7 @@ import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/shared/Navbar";
+import { Footer } from "@/components/shared/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,9 +17,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "BRILLARA | Joyería de Lujo",
+  title: "BRILLARA | Compra de Oro y Plata · Los Ángeles",
   description:
-    "Descubre la excelencia en joyería fina. Piezas únicas que iluminan tu historia. BRILLARA, donde el arte se convierte en legado.",
+    "Vende tu oro, plata, joyas y diamantes de forma segura y transparente. Evaluación profesional y pago inmediato en el área de Los Ángeles.",
 };
 
 export default function RootLayout({
@@ -33,7 +34,8 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <Navbar />
-        {children}
+        <div className="flex flex-1 flex-col">{children}</div>
+        <Footer />
       </body>
     </html>
   );

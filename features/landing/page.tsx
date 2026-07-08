@@ -1,7 +1,21 @@
+"use client";
+
+import { useEffect } from "react";
+import { PriceCalculator } from "./components/PriceCalculator";
+import { Announcements } from "./components/Announcements";
+import { FAQ } from "./components/FAQ";
+import { ContactSection } from "./components/ContactSection";
+import { recordVisit } from "@/services/analytics";
+
 export default function Home() {
+  useEffect(() => {
+    recordVisit("/inicio");
+  }, []);
+
   return (
     <main className="flex flex-1 flex-col">
-      {/* HERO: La única pregunta que importa */}
+      <Announcements />
+
       <section className="relative flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent" />
         
@@ -33,7 +47,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CÓMO FUNCIONA: 4 pasos simples */}
       <section id="como-funciona" className="border-t border-border px-6 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 text-center">
@@ -47,54 +60,24 @@ export default function Home() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
-              {
-                step: "01",
-                title: "Consulta el Precio",
-                desc: "Revisa el precio actualizado que pagamos por gramo de oro y plata en tiempo real.",
-              },
-              {
-                step: "02",
-                title: "Calcula tu Estimado",
-                desc: "Usa nuestra calculadora para saber cuánto podrías recibir según peso y kilataje.",
-              },
-              {
-                step: "03",
-                title: "Inicia tu Negociación",
-                desc: "Abre un ticket, describe tu material, adjunta fotos y conversa con nuestro equipo.",
-              },
-              {
-                step: "04",
-                title: "Cita y Pago",
-                desc: "Acordamos una reunión presencial en el área de Los Ángeles. Evaluación y pago inmediato.",
-              },
+              { step: "01", title: "Consulta el Precio", desc: "Revisa el precio actualizado que pagamos por gramo de oro y plata en tiempo real." },
+              { step: "02", title: "Calcula tu Estimado", desc: "Usa nuestra calculadora para saber cuánto podrías recibir según peso y kilataje." },
+              { step: "03", title: "Inicia tu Negociación", desc: "Abre un ticket, describe tu material, adjunta fotos y conversa con nuestro equipo." },
+              { step: "04", title: "Cita y Pago", desc: "Acordamos una reunión presencial en el área de Los Ángeles. Evaluación y pago inmediato." },
             ].map((item) => (
-              <div
-                key={item.step}
-                className="relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
-              >
-                <span className="mb-4 font-heading text-4xl font-bold text-primary/20">
-                  {item.step}
-                </span>
-                <h3 className="font-heading text-xl font-semibold text-foreground">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.desc}
-                </p>
+              <div key={item.step} className="relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+                <span className="mb-4 font-heading text-4xl font-bold text-primary/20">{item.step}</span>
+                <h3 className="font-heading text-xl font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PLACEHOLDER: Precio en vivo (próximo paso) */}
-      <section id="precio" className="border-t border-border px-6 py-24 text-center">
-        <span className="mb-3 inline-block text-xs font-medium uppercase tracking-widest text-primary">
-          Precio del Día
-        </span>
-        <h2 className="font-heading text-3xl font-semibold text-foreground">Precio del Oro y Plata</h2>
-        <p className="mt-4 text-muted-foreground">Próximamente: precio actualizado en tiempo real + calculadora.</p>
-      </section>
+      <PriceCalculator />
+      <FAQ />
+      <ContactSection />
     </main>
   );
 }
