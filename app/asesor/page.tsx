@@ -6,11 +6,28 @@ import Link from "next/link";
 import { isAdvisorLoggedIn, getCurrentAdvisor, logoutAdvisor } from "@/services/supabase-advisors";
 import { getAllTickets, assignTicketToAdvisor } from "@/services/supabase-tickets";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/ticket-helpers";
+import { TicketStatus } from "@/types/ticket";
+
+interface TicketWithAdvisor {
+  id: string;
+  ticket_number: string;
+  client_name: string;
+  phone: string;
+  city: string;
+  location: string;
+  description: string;
+  photos: string[];
+  status: TicketStatus;
+  advisor_id: string | null;
+  messages: any[];
+  created_at: string;
+  updated_at: string;
+}
 
 export default function AdvisorDashboard() {
   const router = useRouter();
-  const [tickets, setTickets] = useState<any[]>([]);
-  const [myTickets, setMyTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<TicketWithAdvisor[]>([]);
+  const [myTickets, setMyTickets] = useState<TicketWithAdvisor[]>([]);
   const [advisor, setAdvisor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -28,11 +45,11 @@ export default function AdvisorDashboard() {
   async function loadTickets() {
     setLoading(true);
     const all = await getAllTickets();
-    setTickets(all);
+    setTickets(all as TicketWithAdvisor[]);
     
     const current = getCurrentAdvisor();
     if (current) {
-      setMyTickets(all.filter((t: any) => t.advisor_id === current.id));
+      setMyTickets((all as TicketWithAdvisor[]).filter((t) => t.advisor_id === current.id));
     }
     setLoading(false);
   }
@@ -46,7 +63,7 @@ export default function AdvisorDashboard() {
 
   if (!mounted) return null;
 
-  const unassignedTickets = tickets.filter((t: any) => !t.advisor_id && t.status === "nuevo");
+  const unassignedTickets = tickets.filter((t) => !t.advisor_id && t.status === "nuevo");
 
   return (
     <main className="flex flex-1 flex-col px-6 py-12">
@@ -74,7 +91,7 @@ export default function AdvisorDashboard() {
             <p className="text-muted-foreground">No tienes tickets asignados.</p>
           ) : (
             <div className="space-y-3">
-              {myTickets.map((t: any) => (
+              {myTickets.map((t) => (
                 <Link
                   key={t.id}
                   href={`/asesor/tickets/${t.id}`}
@@ -84,8 +101,8 @@ export default function AdvisorDashboard() {
                     <span className="font-mono text-xs text-muted-foreground">#{t.ticket_number || t.id.slice(0, 8)}</span>
                     <p className="text-sm font-medium text-foreground">{t.client_name} — {t.city}</p>
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[t.status as any]}`}>
-                    {STATUS_LABELS[t.status as any]}
+                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[t.status]}`}>
+                    {STATUS_LABELS[t.status]}
                   </span>
                 </Link>
               ))}
@@ -101,7 +118,7 @@ export default function AdvisorDashboard() {
             <p className="text-muted-foreground">No hay tickets nuevos disponibles.</p>
           ) : (
             <div className="space-y-3">
-              {unassignedTickets.map((t: any) => (
+              {unassignedTickets.map((t) => (
                 <div key={t.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
                   <div>
                     <span className="font-mono text-xs text-muted-foreground">#{t.ticket_number || t.id.slice(0, 8)}</span>
