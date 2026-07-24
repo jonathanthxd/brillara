@@ -6,11 +6,29 @@ import Link from "next/link";
 import { isAdvisorLoggedIn, getCurrentAdvisor, logoutAdvisor } from "@/services/supabase-advisors";
 import { getTicketById, updateTicketStatus, addMessageToTicket } from "@/services/supabase-tickets";
 import { STATUS_LABELS, STATUS_COLORS } from "@/lib/ticket-helpers";
+import { TicketStatus } from "@/types/ticket";
+
+interface TicketDetail {
+  id: string;
+  ticket_number: string;
+  client_name: string;
+  phone: string;
+  city: string;
+  location: string;
+  description: string;
+  photos: string[];
+  status: TicketStatus;
+  advisor_id: string | null;
+  messages: any[];
+  created_at: string;
+  updated_at: string;
+  advisors?: { code: string; name: string } | null;
+}
 
 export default function AdvisorTicketDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [ticket, setTicket] = useState<any>(null);
+  const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [advisor, setAdvisor] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
@@ -28,7 +46,7 @@ export default function AdvisorTicketDetailPage() {
   async function loadTicket() {
     const id = params.id as string;
     const t = await getTicketById(id);
-    if (t) setTicket(t);
+    if (t) setTicket(t as TicketDetail);
   }
 
   async function handleSendMessage(e: React.FormEvent) {
@@ -44,15 +62,15 @@ export default function AdvisorTicketDetailPage() {
     });
     
     if (updated) {
-      setTicket(updated);
+      setTicket(updated as TicketDetail);
       setNewMessage("");
     }
   }
 
-  async function handleChangeStatus(newStatus: string) {
+  async function handleChangeStatus(newStatus: TicketStatus) {
     if (!ticket) return;
     const updated = await updateTicketStatus(ticket.id, newStatus);
-    if (updated) setTicket(updated);
+    if (updated) setTicket(updated as TicketDetail);
   }
 
   if (!mounted) return null;
@@ -80,8 +98,8 @@ export default function AdvisorTicketDetailPage() {
               <p className="font-mono text-xs text-muted-foreground">#{ticket.ticket_number || ticket.id.slice(0, 8)}</p>
               <h1 className="font-heading text-2xl font-bold text-foreground">{ticket.client_name}</h1>
             </div>
-            <span className={`rounded-full px-4 py-1.5 text-xs font-medium ${STATUS_COLORS[ticket.status as any]}`}>
-              {STATUS_LABELS[ticket.status as any]}
+            <span className={`rounded-full px-4 py-1.5 text-xs font-medium ${STATUS_COLORS[ticket.status]}`}>
+              {STATUS_LABELS[ticket.status]}
             </span>
           </div>
           
@@ -111,17 +129,17 @@ export default function AdvisorTicketDetailPage() {
           <div className="mt-6 border-t border-border pt-4">
             <p className="mb-2 text-sm font-medium text-foreground">Cambiar estado:</p>
             <div className="flex flex-wrap gap-2">
-              {(["nuevo", "en-negociacion", "cita-programada", "compra-realizada", "cancelado", "archivado"] as string[]).map((s) => (
+              {(["nuevo", "en-negociacion", "cita-programada", "compra-realizada", "cancelado", "archivado"] as TicketStatus[]).map((s) => (
                 <button
                   key={s}
                   onClick={() => handleChangeStatus(s)}
                   className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                     ticket.status === s
-                      ? `${STATUS_COLORS[s as any]} ring-2 ring-offset-2 ring-offset-background ring-primary`
+                      ? `${STATUS_COLORS[s]} ring-2 ring-offset-2 ring-offset-background ring-primary`
                       : "border border-border bg-background text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {STATUS_LABELS[s as any]}
+                  {STATUS_LABELS[s]}
                 </button>
               ))}
             </div>
