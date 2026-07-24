@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "BRILLARA | Compra de Oro y Plata · Los Ángeles",
   description:
     "Vende tu oro, plata, joyas y diamantes de forma segura y transparente. Evaluación profesional y pago inmediato en el área de Los Ángeles.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
