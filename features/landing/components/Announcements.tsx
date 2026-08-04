@@ -1,29 +1,33 @@
 "use client";
 
+import { api } from "@/lib/client-api";
+import { Announcement } from "@/types/announcement";
 import { useEffect, useState } from "react";
-import { getActiveAnnouncements, Announcement } from "@/services/announcements";
+
+interface AnnouncementsResponse {
+  announcements: Announcement[];
+}
 
 export function Announcements() {
   const [items, setItems] = useState<Announcement[]>([]);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setItems(getActiveAnnouncements());
+    void api<AnnouncementsResponse>("/api/public/announcements")
+      .then((data) => setItems(data.announcements))
+      .catch(() => setItems([]));
   }, []);
 
-  if (!mounted || items.length === 0) return null;
+  if (items.length === 0) return null;
 
   return (
-    <div className="space-y-3 px-6 pt-6">
-      {items.map((a) => (
-        <div
-          key={a.id}
-          className="mx-auto max-w-5xl rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-center text-sm text-foreground"
-        >
-          <span className="font-medium">{a.title}:</span> {a.content}
-        </div>
-      ))}
-    </div>
+    <section aria-label="Avisos importantes" className="border-b border-primary/20 bg-primary/5 px-6 py-3">
+      <div className="mx-auto max-w-6xl space-y-1 text-center text-sm">
+        {items.map((item) => (
+          <p key={item.id} className="text-foreground">
+            <span className="font-medium">{item.title}:</span> <span className="text-muted-foreground">{item.content}</span>
+          </p>
+        ))}
+      </div>
+    </section>
   );
 }

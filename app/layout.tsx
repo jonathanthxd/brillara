@@ -24,6 +24,16 @@ export const metadata: Metadata = {
     icon: "/favicon.png",
     apple: "/favicon.png",
   },
+  metadataBase: new URL("https://www.brillara.gold"),
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    locale: "es_US",
+    url: "/inicio",
+    siteName: "BRILLARA",
+    title: "BRILLARA | Compra de Oro y Plata · Los Ángeles",
+    description: "Evaluación profesional y pago inmediato por oro, plata, joyas y diamantes en Los Ángeles.",
+  },
 };
 
 export default function RootLayout({

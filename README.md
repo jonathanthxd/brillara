@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BRILLARA
 
-## Getting Started
+Plataforma de captación y gestión de negociaciones presenciales para compra de oro, plata, joyas y diamantes en Los Ángeles.
 
-First, run the development server:
+## Inicio rápido en Codespaces
+
+Para abrir y probar el diseño y el registro de nombre localmente, basta con:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+En desarrollo, si aún no existe `.env.local`, BRILLARA crea una clave de sesión temporal solo para ese Codespace y muestra el sitio con configuración visual de demostración. Verás una advertencia en la terminal, pero podrás registrar un nombre y comprobar cookies/sesiones sin bloquearte. La creación real de tickets seguirá mostrando un mensaje claro hasta que conectes Supabase.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para probar tickets, panel administrativo y asesores contra tu base de datos real, configura el entorno una vez:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env.local
+openssl rand -base64 48
+```
 
-## Learn More
+Pega el resultado de `openssl` como `SESSION_SECRET` en `.env.local`, completa las otras tres variables y ejecuta:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm check:env
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`pnpm check:env` no muestra secretos: únicamente te dice qué variable falta o es inválida.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Antes de probar asesores, anuncios o el panel de configuración, pega el contenido de `supabase/migrations/20260804_secure_brillara.sql` en **Supabase → SQL Editor → New query → Run**. Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
 
-## Deploy on Vercel
+## Qué cambió en esta versión
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- La identificación del visitante se guarda en una cookie privada y firmada. Un navegador o ventana incógnita nueva siempre empieza en la pantalla “¿Cómo te llamas?”.
+- Los tickets, teléfonos, fotos, asesores y paneles ya no se consultan desde el navegador con Supabase.
+- Administración y asesores usan sesiones HTTP-only emitidas por el servidor.
+- Se eliminó la página de prueba que exponía contraseñas de asesores.
+- Los ajustes y anuncios pasan a persistirse en Supabase, no en el `localStorage` del administrador.
+- Se añadieron validaciones de formularios, límites de fotos, estados de carga/error, cabeceras de seguridad y SEO básico.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Antes de desplegar
+
+1. En Supabase, abre **SQL Editor** y ejecuta el archivo:
+
+   `supabase/migrations/20260804_secure_brillara.sql`
+
+   La migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`.
+
+2. En Vercel, configura estas variables de entorno para Production, Preview y Development:
+
+   | Variable | Uso |
+   | --- | --- |
+   | `SUPABASE_URL` | URL del proyecto Supabase. |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Clave `service_role`; solo en Vercel, nunca en código cliente. |
+   | `SESSION_SECRET` | Texto aleatorio de 32+ caracteres para firmar cookies. |
+   | `ADMIN_PASSWORD` | Nueva contraseña fuerte del panel de administración. |
+
+   Usa `.env.example` como plantilla local. No copies las claves al repositorio ni a variables `NEXT_PUBLIC_*`. La clave requerida es `service_role`, no la `anon/public`.
+
+3. Cambia la contraseña anterior de administración. Estaba expuesta dentro del código previo y debe considerarse comprometida.
+
+4. Despliega y comprueba el flujo de verificación de abajo.
+
+## Flujo de identidad y privacidad
+
+Al registrar el nombre, BRILLARA crea una sesión firmada en una cookie `HttpOnly`. Esa sesión guarda la relación del navegador con sus tickets. Por eso:
+
+- el mismo dispositivo puede volver y ver sus tickets;
+- una ventana de incógnito o un navegador nuevo debe indicar su nombre;
+- un visitante no puede consultar tickets de otros navegadores cambiando el nombre;
+- los tickets anteriores a este cambio no se asocian automáticamente a una sesión segura. El equipo puede atenderlos desde administración y los nuevos tickets ya quedan protegidos.
+
+## Verificación manual después del despliegue
+
+1. Abre `https://www.brillara.gold/` en una ventana incógnita: debe aparecer el formulario de nombre.
+2. Indica un nombre y crea un ticket. Debe abrirse el detalle y aparecer en `/tickets`.
+3. Abre otra ventana incógnita: no debe aparecer el nombre ni el ticket anterior.
+4. Inicia sesión en `/admin/login`, verifica que el ticket aparezca, responde y cambia el estado.
+5. En `/asesor/login`, comprueba que un asesor solo ve tickets nuevos o asignados a él.
+6. En Supabase, confirma que las tablas `tickets` y `advisors` no admiten consultas con el rol `anon`.
+
+La migración también genera hashes de las contraseñas de asesores y verifica sus credenciales únicamente dentro de la base de datos. Conserva la columna antigua temporalmente para poder revertir durante el despliegue; cuando el nuevo flujo lleve varios días estable, elimínala desde Supabase.
+
+## Desarrollo
+
+```bash
+cp .env.example .env.local
+pnpm check:env
+pnpm install
+pnpm lint
+pnpm build
+pnpm dev
+```
+
+Las fotos continúan usando la columna existente de imágenes codificadas para preservar la compatibilidad con los tickets actuales. El formulario limita cada imagen a 2 MB y cuatro adjuntos. La siguiente mejora de infraestructura recomendada es moverlas a un bucket privado de Supabase Storage y guardar URLs firmadas.

@@ -1,17 +1,9 @@
-"use client";
-
-import { useEffect } from "react";
 import { PriceCalculator } from "./components/PriceCalculator";
 import { Announcements } from "./components/Announcements";
 import { FAQ } from "./components/FAQ";
 import { ContactSection } from "./components/ContactSection";
-import { recordVisit } from "@/services/analytics";
 
 export default function Home() {
-  useEffect(() => {
-    recordVisit("/inicio");
-  }, []);
-
   return (
     <main className="flex flex-1 flex-col">
       <Announcements />

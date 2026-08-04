@@ -1,51 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getConfig, BrillaraConfig } from "@/services/config";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
-  const [config, setConfig] = useState<BrillaraConfig | null>(null);
+  const pathname = usePathname();
 
-  useEffect(() => {
-    setConfig(getConfig());
-  }, []);
+  if (pathname === "/") return null;
 
   return (
-    <footer className="border-t border-border px-6 py-16">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 md:grid-cols-3">
-          <div>
-            <p className="font-heading text-2xl font-bold text-foreground">BRILLARA</p>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Compra profesional de metales preciosos en el área de Los Ángeles. Transparencia, evaluación experta y pago inmediato.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-foreground">Contacto</p>
-            <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <p>📞 {config?.phoneContact || "(323) 555-0199"}</p>
-              <p>📍 {config?.coverageArea?.split(",")[0] || "Los Ángeles, CA"}</p>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-foreground">Horario</p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              {config?.businessHours || "Lunes a Sábado: 9:00 AM - 6:00 PM"}
-            </p>
-            <div className="mt-4 flex gap-4">
-              <Link href="/inicio" className="text-sm text-muted-foreground hover:text-primary">Inicio</Link>
-              <Link href="/inicio#precio" className="text-sm text-muted-foreground hover:text-primary">Precios</Link>
-              <Link href="/tickets" className="text-sm text-muted-foreground hover:text-primary">Mis Tickets</Link>
-            </div>
-          </div>
+    <footer className="border-t border-border px-6 py-10">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="font-heading text-lg font-semibold text-foreground">BRILLARA</p>
+          <p className="mt-1">Compra de metales preciosos con atención presencial en Los Ángeles.</p>
         </div>
-
-        <div className="mt-12 border-t border-border pt-8 text-center text-xs text-muted-foreground">
-          <p>© 2026 BRILLARA. Todos los derechos reservados.</p>
-        </div>
+        <nav className="flex flex-wrap gap-x-5 gap-y-2" aria-label="Navegación del pie de página">
+          <Link href="/inicio" className="transition-colors hover:text-primary">Inicio</Link>
+          <Link href="/inicio#precio" className="transition-colors hover:text-primary">Estimador</Link>
+          <Link href="/tickets" className="transition-colors hover:text-primary">Mis tickets</Link>
+          <Link href="/" className="transition-colors hover:text-primary">Cambiar nombre</Link>
+        </nav>
       </div>
     </footer>
   );
