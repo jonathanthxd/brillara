@@ -8,28 +8,45 @@ type Theme = "light" | "dark";
 const STORAGE_KEY = "brillara-theme";
 const THEME_EVENT = "brillara:theme-changed";
 
-function applyTheme(theme: Theme) {
+function applyTheme(theme: Theme): void {
   document.documentElement.classList.toggle("dark", theme === "dark");
   document.documentElement.style.colorScheme = theme;
 }
 
+function subscribeToTheme(onStoreChange: () => void): () => void {
+  window.addEventListener(THEME_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener(THEME_EVENT, onStoreChange);
+  };
+}
+
+function getThemeSnapshot(): Theme {
+  return window.localStorage.getItem(STORAGE_KEY) === "dark"
+    ? "dark"
+    : "light";
+}
+
+function getServerThemeSnapshot(): Theme {
+  return "light";
+}
+
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(
-    (onStoreChange) => {
-      window.addEventListener(THEME_EVENT, onStoreChange);
-      return () => window.removeEventListener(THEME_EVENT, onStoreChange);
-    },
-    () => window.localStorage.getItem(STORAGE_KEY) === "dark" ? "dark" : "light",
-    () => "light",
+  const theme = useSyncExternalStore<Theme>(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
   );
 
   useEffect(() => {
     applyTheme(theme);
   }, [theme]);
 
-  function toggleTheme() {
+  function toggleTheme(): void {
     const nextTheme: Theme = theme === "light" ? "dark" : "light";
+
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
+    applyTheme(nextTheme);
     window.dispatchEvent(new Event(THEME_EVENT));
   }
 
@@ -38,10 +55,18 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground transition-all hover:border-primary/40 hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-      aria-label={theme === "light" ? "Activar modo oscuro" : "Activar modo claro"}
+      aria-label={
+        theme === "light"
+          ? "Activar modo oscuro"
+          : "Activar modo claro"
+      }
       title={theme === "light" ? "Modo oscuro" : "Modo claro"}
     >
-      {theme === "dark" ? <Sun className="size-4" aria-hidden /> : <Moon className="size-4" aria-hidden />}
+      {theme === "dark" ? (
+        <Sun className="size-4" aria-hidden />
+      ) : (
+        <Moon className="size-4" aria-hidden />
+      )}
     </button>
   );
 }
