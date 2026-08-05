@@ -3,7 +3,7 @@
 import { api } from "@/lib/client-api";
 import { DEFAULT_SETTINGS, PublicSettings } from "@/lib/pricing";
 import { Clock3, MapPinned, Phone, CarFront, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { LiquidMetalLink } from "@/components/ui/liquid-metal-button";
 import { useEffect, useState } from "react";
 
 interface SettingsResponse {
@@ -29,7 +29,7 @@ export function ContactSection() {
           <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground md:text-5xl">Cobertura y contacto</h2>
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
-          <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
+          <div className="brillara-card rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
             <h3 className="font-heading text-xl font-semibold text-foreground">Áreas que cubrimos</h3>
             <p className="mt-2 text-sm text-muted-foreground">Nos desplazamos hasta tu ubicación dentro de estas zonas:</p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -37,14 +37,14 @@ export function ContactSection() {
             </div>
             <p className="mt-6 text-xs text-muted-foreground">¿No ves tu ciudad? Contáctanos de todos modos. Evaluamos caso por caso.</p>
           </div>
-          <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
+          <div className="brillara-card rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
             <h3 className="font-heading text-xl font-semibold text-foreground">Habla con nosotros</h3>
             <div className="mt-6 space-y-4">
               <ContactItem icon={<Phone className="size-5" aria-hidden />} label="Teléfono" value={settings.phoneContact} />
               <ContactItem icon={<Clock3 className="size-5" aria-hidden />} label="Horario" value={settings.businessHours} />
               <ContactItem icon={<CarFront className="size-5" aria-hidden />} label="Servicio" value="Desplazamiento incluido en el área" />
             </div>
-            <Link href="/ticket/nuevo" className="mt-8 inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground transition-all hover:-translate-y-0.5 hover:brightness-110">Iniciar negociación ahora <ArrowRight className="size-4" aria-hidden /></Link>
+            <LiquidMetalLink href="/ticket/nuevo" className="mt-8 w-full" icon={<ArrowRight className="size-4" aria-hidden />}>Iniciar negociación ahora</LiquidMetalLink>
           </div>
         </div>
       </div>

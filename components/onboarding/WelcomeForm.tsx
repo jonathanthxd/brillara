@@ -3,6 +3,7 @@
 import { api } from "@/lib/client-api";
 import { PROFILE_CHANGE_EVENT } from "@/lib/profile-events";
 import { ArrowRight, BadgeCheck, HandCoins, ShieldCheck, Sparkles } from "lucide-react";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -38,7 +39,7 @@ export function WelcomeForm() {
       <div className="pointer-events-none absolute -bottom-32 -right-20 -z-10 size-96 rounded-full border border-primary/15" />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <section className="text-center lg:text-left">
+        <section className="brillara-reveal text-center lg:text-left">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             <Sparkles className="size-3.5" aria-hidden /> Bienvenido a BRILLARA
           </div>
@@ -55,7 +56,7 @@ export function WelcomeForm() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-border bg-card/90 p-5 shadow-2xl shadow-primary/10 backdrop-blur sm:p-8">
+        <section className="brillara-reveal brillara-reveal-delay rounded-[2rem] border border-border bg-card/90 p-5 shadow-2xl shadow-primary/10 backdrop-blur sm:p-8">
           <div className="flex items-center gap-3">
             <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-lg font-heading font-bold text-primary-foreground">B</span>
             <div>
@@ -81,14 +82,15 @@ export function WelcomeForm() {
               />
             </div>
             {error && <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
-            <button
+            <LiquidMetalButton
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              size="lg"
+              className="w-full"
+              icon={!isSubmitting ? <ArrowRight className="size-4" aria-hidden /> : undefined}
             >
               {isSubmitting ? "Entrando..." : "Conocer BRILLARA"}
-              {!isSubmitting && <ArrowRight className="size-4" aria-hidden />}
-            </button>
+            </LiquidMetalButton>
           </form>
           <p className="mt-5 text-center text-xs leading-relaxed text-muted-foreground">Guardamos tu nombre en una cookie privada de este dispositivo para que puedas volver a tus tickets.</p>
         </section>

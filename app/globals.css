@@ -100,3 +100,38 @@
 html {
   scroll-behavior: smooth;
 }
+
+@keyframes brillara-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.brillara-reveal { animation: brillara-rise 560ms cubic-bezier(.2,.75,.3,1) both; }
+.brillara-reveal-delay { animation-delay: 100ms; }
+.brillara-reveal-delay-2 { animation-delay: 190ms; }
+.brillara-card { transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease; }
+.brillara-card:hover { transform: translateY(-4px); }
+@keyframes brillara-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes brillara-orbit { to { transform: rotate(360deg); } }
+.brillara-float { animation: brillara-float 4.8s ease-in-out infinite; }
+.brillara-orbit { animation: brillara-orbit 26s linear infinite; }
+
+.liquid-metal-button { position: relative; display: inline-flex; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; text-decoration: none; border-radius: 9999px; transition: transform 180ms ease; }
+.liquid-metal-button:hover { transform: translateY(-2px); }
+.liquid-metal-button:active { transform: translateY(0) scale(.985); }
+.liquid-metal-button:focus-visible { outline: 3px solid color-mix(in oklab, var(--ring) 45%, transparent); outline-offset: 3px; }
+.liquid-metal-button:disabled { cursor: not-allowed; opacity: .5; transform: none; }
+@keyframes liquid-metal-flow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.liquid-metal-frame { position: relative; display: block; overflow: hidden; border-radius: 9999px; padding: 4px; box-shadow: 0 18px 38px -17px color-mix(in oklab, var(--foreground) 55%, transparent); isolation: isolate; }
+.liquid-metal-fallback, .liquid-metal-canvas { position: absolute; inset: 0; }
+.liquid-metal-fallback { z-index: 0; background: linear-gradient(105deg, #6a4212 0%, #d5a737 20%, #fff6cb 42%, #a06b17 57%, #f2d77d 73%, #75501a 100%); background-size: 280% 100%; animation: liquid-metal-flow 3.8s ease-in-out infinite; }
+.dark .liquid-metal-fallback { background: linear-gradient(105deg, #1e3652 0%, #5e88ba 20%, #f2f7ff 42%, #35577c 57%, #9fc6ef 73%, #263e5d 100%); background-size: 280% 100%; }
+.liquid-metal-canvas { z-index: 1; opacity: 1; mix-blend-mode: screen; }
+.liquid-metal-body { position: relative; z-index: 2; display: inline-flex; width: 100%; align-items: center; justify-content: center; gap: .55rem; border-radius: 9999px; background: color-mix(in oklab, var(--card) 94%, var(--background)); color: var(--foreground); font-weight: 650; letter-spacing: -.01em; transition: background-color 180ms ease; }
+.liquid-metal-button:hover .liquid-metal-body { background: color-mix(in oklab, var(--card) 82%, var(--accent)); }
+.liquid-metal-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; border-radius: 9999px; background: var(--primary); color: var(--primary-foreground); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .liquid-metal-canvas { display: none; }
+}

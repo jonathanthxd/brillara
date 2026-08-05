@@ -5,6 +5,7 @@ import { Ticket } from "@/types/ticket";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 
 interface ProfileResponse {
   registered: boolean;
@@ -168,9 +169,9 @@ export default function NewTicketPage() {
           </div>
 
           {error && <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{error}</p>}
-          <button type="submit" disabled={isSubmitting || !clientName || !phone || !city || description.trim().length < 10} className="inline-flex h-14 w-full items-center justify-center rounded-full bg-primary px-10 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">
+          <LiquidMetalButton type="submit" disabled={isSubmitting || !clientName || !phone || !city || description.trim().length < 10} size="lg" className="w-full">
             {isSubmitting ? "Creando ticket…" : "Crear ticket de negociación"}
-          </button>
+          </LiquidMetalButton>
         </form>
       </div>
     </main>

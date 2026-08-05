@@ -12,6 +12,7 @@ import {
   UNITS,
 } from "@/lib/pricing";
 import { Calculator, CircleDollarSign, Gem, Sparkles } from "lucide-react";
+import { LiquidMetalButton } from "@/components/ui/liquid-metal-button";
 import { useEffect, useMemo, useState } from "react";
 
 interface SettingsResponse {
@@ -75,8 +76,8 @@ export function PriceCalculator() {
             <div className="space-y-2"><label className="text-sm font-medium text-foreground" htmlFor="unit">Unidad</label><select id="unit" value={unit} onChange={(event) => { setUnit(event.target.value); setEstimate(null); }} className="input">{UNITS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
             <div className="space-y-2"><label className="text-sm font-medium text-foreground" htmlFor="karat">Kilataje</label><select id="karat" value={karat} onChange={(event) => { setKarat(Number(event.target.value)); setEstimate(null); }} className="input">{KARATS.map((item) => <option key={item.value} value={item.value}>{item.label} ({(item.purity * 100).toFixed(1)}% puro)</option>)}</select></div>
           </div>
-          <button type="button" onClick={handleCalculate} disabled={!weight || Number.parseFloat(weight) <= 0} className="mt-8 inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-7 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"><Calculator className="size-4" aria-hidden /> Calcular estimación</button>
-          {estimate !== null && <div aria-live="polite" className="mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-6"><p className="text-sm font-medium text-muted-foreground">Estimación aproximada que BRILLARA podría pagar:</p><p className="mt-2 font-heading text-4xl font-bold text-primary md:text-5xl">{formatCurrency(estimate)}</p><p className="mt-3 text-xs leading-relaxed text-muted-foreground">Es una orientación, no una oferta final. El valor se confirma mediante inspección física del material.</p></div>}
+          <LiquidMetalButton type="button" onClick={handleCalculate} disabled={!weight || Number.parseFloat(weight) <= 0} size="lg" className="mt-8 w-full sm:w-auto" icon={<Calculator className="size-4" aria-hidden />}>Calcular estimación</LiquidMetalButton>
+          {estimate !== null && <div aria-live="polite" className="brillara-reveal mt-8 rounded-2xl border border-primary/20 bg-primary/5 p-6"><p className="text-sm font-medium text-muted-foreground">Estimación aproximada que BRILLARA podría pagar:</p><p className="mt-2 font-heading text-4xl font-bold text-primary md:text-5xl">{formatCurrency(estimate)}</p><p className="mt-3 text-xs leading-relaxed text-muted-foreground">Es una orientación, no una oferta final. El valor se confirma mediante inspección física del material.</p></div>}
         </div>
       </div>
     </section>

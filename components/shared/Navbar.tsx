@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import { LiquidMetalLink } from "@/components/ui/liquid-metal-button";
 
 interface ProfileResponse {
   registered: boolean;
@@ -87,12 +88,7 @@ export function Navbar() {
               Identificarme
             </Link>
           )}
-          <Link
-            href={profile?.registered ? "/ticket/nuevo" : "/"}
-            className="hidden h-10 items-center justify-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30 transition-all hover:-translate-y-0.5 hover:brightness-110 sm:inline-flex sm:px-5"
-          >
-            Iniciar negociación
-          </Link>
+          <LiquidMetalLink href={profile?.registered ? "/ticket/nuevo" : "/"} size="sm" className="hidden sm:inline-flex">Iniciar negociación</LiquidMetalLink>
           <button
             type="button"
             onClick={() => setIsMenuOpen((open) => !open)}
@@ -119,9 +115,7 @@ export function Navbar() {
             ) : (
               <MobileLink href="/" onClick={() => setIsMenuOpen(false)}>Identificarme</MobileLink>
             )}
-            <Link href={profile?.registered ? "/ticket/nuevo" : "/"} onClick={() => setIsMenuOpen(false)} className="mt-2 inline-flex h-11 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground">
-              Iniciar negociación
-            </Link>
+            <LiquidMetalLink href={profile?.registered ? "/ticket/nuevo" : "/"} onClick={() => setIsMenuOpen(false)} className="mt-2 w-full">Iniciar negociación</LiquidMetalLink>
           </nav>
         </div>
       )}

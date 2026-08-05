@@ -3,6 +3,7 @@ import { Announcements } from "./components/Announcements";
 import { FAQ } from "./components/FAQ";
 import { ContactSection } from "./components/ContactSection";
 import { ArrowRight, BadgeCheck, Calculator, CalendarCheck2, CircleDollarSign, Gem, ShieldCheck } from "lucide-react";
+import { LiquidMetalLink } from "@/components/ui/liquid-metal-button";
 
 export default function Home() {
   return (
@@ -11,10 +12,10 @@ export default function Home() {
 
       <section className="relative isolate overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
         <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_18%_10%,color-mix(in_oklab,var(--primary)_16%,transparent),transparent_27rem),radial-gradient(circle_at_85%_75%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_28rem)]" />
-        <div className="pointer-events-none absolute -right-24 -top-32 -z-10 size-[31rem] rounded-full border border-primary/15" />
-        <div className="pointer-events-none absolute -bottom-56 -left-28 -z-10 size-[35rem] rounded-full border border-primary/10" />
+        <div className="brillara-orbit pointer-events-none absolute -right-24 -top-32 -z-10 size-[31rem] rounded-full border border-primary/15" />
+        <div className="brillara-orbit pointer-events-none absolute -bottom-56 -left-28 -z-10 size-[35rem] rounded-full border border-primary/10" />
         <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-16">
-          <div className="text-center lg:text-left">
+          <div className="brillara-reveal text-center lg:text-left">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               <BadgeCheck className="size-3.5" aria-hidden /> Compra de metales preciosos · Los Ángeles, CA
             </span>
@@ -25,12 +26,7 @@ export default function Home() {
               Obtén una referencia honesta para oro, plata, joyas y diamantes. Evaluación profesional, transparencia total y pago inmediato en tu cita presencial.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-          <a
-            href="#precio"
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-110"
-          >
-            Ver precio de hoy <ArrowRight className="size-4" aria-hidden />
-          </a>
+          <LiquidMetalLink href="#precio" size="lg" icon={<ArrowRight className="size-4" aria-hidden />}>Ver precio de hoy</LiquidMetalLink>
           <a
             href="#como-funciona"
             className="inline-flex h-14 items-center justify-center rounded-full border border-border bg-card/80 px-7 text-base font-medium text-card-foreground transition-all hover:border-primary/30 hover:bg-accent"
@@ -45,8 +41,8 @@ export default function Home() {
             </div>
           </div>
 
-          <aside className="relative mx-auto w-full max-w-md rounded-[2rem] border border-border bg-card/85 p-5 shadow-2xl shadow-primary/10 backdrop-blur sm:p-7">
-            <div className="absolute -right-3 -top-3 flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25"><Gem className="size-5" aria-hidden /></div>
+          <aside className="brillara-reveal brillara-reveal-delay relative mx-auto w-full max-w-md rounded-[2rem] border border-border bg-card/85 p-5 shadow-2xl shadow-primary/10 backdrop-blur sm:p-7">
+            <div className="brillara-float absolute -right-3 -top-3 flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25"><Gem className="size-5" aria-hidden /></div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Tu experiencia</p>
             <h2 className="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground">Información antes de negociar.</h2>
             <div className="mt-6 space-y-3">
@@ -76,7 +72,7 @@ export default function Home() {
               { step: "03", icon: <Gem className="size-5" aria-hidden />, title: "Inicia tu Negociación", desc: "Abre un ticket, describe tu material, adjunta fotos y conversa con nuestro equipo." },
               { step: "04", icon: <CalendarCheck2 className="size-5" aria-hidden />, title: "Cita y Pago", desc: "Acordamos una reunión presencial en el área de Los Ángeles. Evaluación y pago inmediato." },
             ].map((item) => (
-              <div key={item.step} className="relative flex flex-col rounded-3xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary/35 hover:shadow-xl hover:shadow-primary/5">
+              <div key={item.step} className="brillara-card relative flex flex-col rounded-3xl border border-border bg-card p-6 hover:border-primary/35 hover:shadow-xl hover:shadow-primary/5">
                 <div className="flex items-center justify-between"><span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">{item.icon}</span><span className="font-heading text-2xl font-bold text-primary/30">{item.step}</span></div>
                 <h3 className="font-heading text-xl font-semibold text-foreground">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
