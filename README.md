@@ -35,6 +35,7 @@ Antes de probar tickets, asesores, anuncios, referidos o partners, ejecuta estas
 2. `supabase/migrations/20260805_advisor_management.sql`
 3. `supabase/migrations/20260805_referral_tracking.sql`
 4. `supabase/migrations/20260806_partner_operations.sql`
+5. `supabase/migrations/20260807_fix_schedule_partner_appointment.sql`
 
 Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
 
@@ -66,6 +67,7 @@ Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de 
    `supabase/migrations/20260805_referral_tracking.sql`
 
    `supabase/migrations/20260806_partner_operations.sql`
+   y, si ya existe la base de datos de partners, `supabase/migrations/20260807_fix_schedule_partner_appointment.sql`.
 
    La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel. La tercera incorpora los enlaces de referido, sus métricas y la relación permanente entre cliente, referido y ticket. La cuarta agrega partners, sucursales, usuarios individuales, citas, compras y auditoría sin alterar los referidos existentes.
 

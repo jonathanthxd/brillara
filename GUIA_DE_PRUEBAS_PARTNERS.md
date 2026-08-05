@@ -10,6 +10,7 @@ Esta guía valida el flujo completo sin romper el sistema de referidos existente
    2. `supabase/migrations/20260805_advisor_management.sql`
    3. `supabase/migrations/20260805_referral_tracking.sql`
    4. `supabase/migrations/20260806_partner_operations.sql`
+   5. `supabase/migrations/20260807_fix_schedule_partner_appointment.sql`
 
 2. Configura `.env.local` o Vercel con las variables existentes:
 

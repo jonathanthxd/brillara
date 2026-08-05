@@ -435,10 +435,10 @@ begin
     raise exception using errcode = '22023', message = 'El partner o la sucursal no están disponibles.';
   end if;
 
-  update public.partner_appointments
+  update public.partner_appointments as appointment
   set status = 'reprogramada'
-  where ticket_id = v_ticket.id
-    and status in ('programada', 'pendiente-confirmacion');
+  where appointment.ticket_id = v_ticket.id
+    and appointment.status in ('programada', 'pendiente-confirmacion');
   get diagnostics v_replaced_count = row_count;
   v_replaced := v_replaced_count > 0;
 
@@ -891,7 +891,7 @@ revoke all on function public.record_partner_auth_event(text, boolean, uuid, tex
 revoke all on function public.admin_create_partner_user(uuid, uuid, text, text, text, text, boolean) from public, anon, authenticated;
 revoke all on function public.admin_update_partner_user(uuid, uuid, text, text, text, text, boolean) from public, anon, authenticated;
 revoke all on function public.schedule_partner_appointment(text, text, uuid, uuid, timestamptz, text) from public, anon, authenticated;
-revoke all on function public.partner_confirm_purchase(text, uuid, uuid, text, text, numeric, numeric, numeric, numeric, text, text, text, text, text, timestamptz) from public, anon, authenticated;
+revoke all on function public.partner_confirm_purchase(text, uuid, uuid, text, text, numeric, numeric, numeric, numeric, text, text, text, text, text, text, timestamptz) from public, anon, authenticated;
 revoke all on function public.partner_record_outcome(text, uuid, uuid, text, text, timestamptz) from public, anon, authenticated;
 revoke all on function public.partner_report_problem(text, uuid, uuid, text, text) from public, anon, authenticated;
 revoke all on function public.admin_void_purchase(uuid, text, text) from public, anon, authenticated;
@@ -904,7 +904,7 @@ grant execute on function public.record_partner_auth_event(text, boolean, uuid, 
 grant execute on function public.admin_create_partner_user(uuid, uuid, text, text, text, text, boolean) to service_role;
 grant execute on function public.admin_update_partner_user(uuid, uuid, text, text, text, text, boolean) to service_role;
 grant execute on function public.schedule_partner_appointment(text, text, uuid, uuid, timestamptz, text) to service_role;
-grant execute on function public.partner_confirm_purchase(text, uuid, uuid, text, text, numeric, numeric, numeric, numeric, text, text, text, text, text, timestamptz) to service_role;
+grant execute on function public.partner_confirm_purchase(text, uuid, uuid, text, text, numeric, numeric, numeric, numeric, text, text, text, text, text, text, timestamptz) to service_role;
 grant execute on function public.partner_record_outcome(text, uuid, uuid, text, text, timestamptz) to service_role;
 grant execute on function public.partner_report_problem(text, uuid, uuid, text, text) to service_role;
 grant execute on function public.admin_void_purchase(uuid, text, text) to service_role;
