@@ -29,7 +29,7 @@ export async function GET() {
     await requireAdmin();
     const { data, error } = await getSupabaseAdmin()
       .from("advisors")
-      .select("id, code, name, created_at, updated_at")
+      .select("id, code, referral_code, name, created_at, updated_at")
       .order("name", { ascending: true });
 
     if (error) mapAdvisorError(error);

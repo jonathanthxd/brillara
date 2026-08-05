@@ -5,6 +5,7 @@ import {
   getVisitorSession,
   setVisitorSession,
 } from "@/lib/server/session";
+import { getReferralForTicket } from "@/lib/server/referrals";
 import { DatabaseTicket, toTicket } from "@/lib/tickets";
 import { validateTicketInput } from "@/lib/validation";
 import { NextRequest, NextResponse } from "next/server";
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await requireVisitor();
     const input = validateTicketInput(await request.json());
+    const referral = await getReferralForTicket();
     const { data, error } = await getSupabaseAdmin()
       .from("tickets")
       .insert({
@@ -60,7 +62,13 @@ export async function POST(request: NextRequest) {
         description: input.description,
         photos: input.photos,
         status: "nuevo",
-        advisor_id: null,
+        // A publicist also operates as an advisor, so a verified referral is
+        // assigned to them immediately instead of entering the general pool.
+        advisor_id: referral?.activeAdvisorId ?? null,
+        referral_attribution_id: referral?.attributionId ?? null,
+        referrer_advisor_id: referral?.advisorId ?? null,
+        referrer_code: referral?.advisorCode ?? null,
+        referrer_name: referral?.advisorName ?? null,
         messages: [],
       })
       .select("*")

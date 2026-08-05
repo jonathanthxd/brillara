@@ -33,6 +33,7 @@ Antes de probar tickets, asesores, anuncios o el panel de configuración, ejecut
 
 1. `supabase/migrations/20260804_secure_brillara.sql`
 2. `supabase/migrations/20260805_advisor_management.sql`
+3. `supabase/migrations/20260805_referral_tracking.sql`
 
 Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
 
@@ -57,7 +58,9 @@ Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de 
 
    `supabase/migrations/20260805_advisor_management.sql`
 
-   La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel.
+   `supabase/migrations/20260805_referral_tracking.sql`
+
+   La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel. La tercera incorpora los enlaces de referido, sus métricas y la relación permanente entre cliente, referido y ticket.
 
 2. En Vercel, configura estas variables de entorno para Production, Preview y Development:
 
@@ -94,6 +97,24 @@ Al registrar el nombre, BRILLARA crea una sesión firmada en una cookie `HttpOnl
 7. Edita el código o renueva la contraseña desde `/admin/asesores`; comprueba que el asesor puede entrar con el nuevo acceso. Si renuevas la contraseña, su sesión anterior se invalida.
 8. Elimina el asesor de prueba y confirma que ya no puede entrar; los tickets que tenía asignados deben quedar disponibles para el equipo.
 9. En Supabase, confirma que las tablas `tickets` y `advisors` no admiten consultas con el rol `anon`.
+
+## Enlaces de referido
+
+Cada asesor recibe un código público permanente al crearse. Por ejemplo, un asesor creado con el código `10001` comparte:
+
+```text
+https://www.brillara.gold/r/10001
+```
+
+El enlace oficial usa `/r/` porque llega al servidor desde el primer instante. También se acepta el formato anterior `https://www.brillara.gold/#10001` y `?ref=10001`, pero el primero es el recomendado.
+
+- La primera referencia válida queda asociada al navegador durante 90 días y no puede ser reemplazada por otro enlace posterior.
+- Al registrar su nombre, el cliente queda visible como un registro conseguido por ese asesor.
+- Al abrir un ticket, el origen queda guardado de forma permanente y el ticket se asigna automáticamente al asesor que lo refirió.
+- El panel del asesor muestra visitas únicas, registrados, tickets y compras realizadas. Administración ve estas métricas para cada asesor dentro de **Equipo de asesores**.
+- La atribución conserva el código y nombre históricos incluso si después se edita el código de acceso del asesor.
+
+Consulta `GUIA_DE_PRUEBAS_REFERIDOS.md` para hacer la prueba completa antes de usarlo con publicistas reales.
 
 La migración genera hashes de las contraseñas de asesores y verifica sus credenciales únicamente dentro de la base de datos. Tras convertir credenciales antiguas, borra el valor en texto plano de cada registro; si un asesor no recuerda su clave, simplemente restablécela desde el panel.
 

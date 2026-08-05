@@ -11,6 +11,10 @@ export interface DatabaseTicket {
   photos: string[] | null;
   status: string | null;
   advisor_id: string | null;
+  referral_attribution_id?: string | null;
+  referrer_advisor_id?: string | null;
+  referrer_code?: string | null;
+  referrer_name?: string | null;
   messages: TicketMessage[] | null;
   created_at: string;
   updated_at: string;
@@ -30,6 +34,10 @@ export function toTicket(record: DatabaseTicket): Ticket {
     status: (record.status ?? "nuevo") as TicketStatus,
     advisorId: record.advisor_id,
     advisor: record.advisors ?? null,
+    referralAttributionId: record.referral_attribution_id ?? null,
+    referrer: record.referrer_code && record.referrer_name
+      ? { code: record.referrer_code, name: record.referrer_name }
+      : null,
     messages: record.messages ?? [],
     createdAt: record.created_at,
     updatedAt: record.updated_at,

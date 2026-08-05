@@ -33,7 +33,7 @@ export function jsonError(error: unknown): NextResponse {
   if (process.env.NODE_ENV === "development" && ["42P01", "42703", "PGRST202"].includes(databaseCode)) {
     console.error("Database migration error", databaseCode);
     return NextResponse.json(
-      { error: "La migración de Supabase aún no está aplicada. Ejecuta primero 20260804_secure_brillara.sql y después 20260805_advisor_management.sql en Supabase SQL Editor." },
+      { error: "La migración de Supabase aún no está aplicada. Ejecuta todas las migraciones indicadas en README.md, en el orden mostrado." },
       { status: 503 },
     );
   }

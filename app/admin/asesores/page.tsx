@@ -2,7 +2,7 @@
 
 import { api, ClientApiError } from "@/lib/client-api";
 import { Advisor } from "@/types/advisor";
-import { KeyRound, Pencil, Plus, ShieldCheck, Trash2, UserRound, UsersRound } from "lucide-react";
+import { Copy, KeyRound, Link2, MousePointerClick, Pencil, Plus, ShoppingBag, ShieldCheck, TicketCheck, Trash2, UserCheck, UserRound, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,22 @@ interface AdvisorsResponse {
 
 interface AdvisorResponse {
   advisor: Advisor;
+}
+
+interface ReferralReport {
+  advisorId: string;
+  advisorCode: string;
+  advisorName: string;
+  referralCode: string;
+  shareUrl: string;
+  uniqueVisitors: number;
+  registeredLeads: number;
+  ticketsCreated: number;
+  purchasesCompleted: number;
+}
+
+interface ReferralReportsResponse {
+  reports: ReferralReport[];
 }
 
 interface AdvisorForm {
@@ -33,6 +49,7 @@ function displayDate(value: string | null): string {
 export default function AdvisorManagementPage() {
   const router = useRouter();
   const [advisors, setAdvisors] = useState<Advisor[]>([]);
+  const [reports, setReports] = useState<ReferralReport[]>([]);
   const [form, setForm] = useState<AdvisorForm>(EMPTY_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,12 +57,17 @@ export default function AdvisorManagementPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
-        const data = await api<AdvisorsResponse>("/api/admin/advisors");
-        setAdvisors(data.advisors);
+        const [advisorData, reportData] = await Promise.all([
+          api<AdvisorsResponse>("/api/admin/advisors"),
+          api<ReferralReportsResponse>("/api/admin/referrals"),
+        ]);
+        setAdvisors(advisorData.advisors);
+        setReports(reportData.reports);
       } catch (requestError) {
         if (requestError instanceof ClientApiError && requestError.status === 401) {
           router.replace("/admin/login");
@@ -123,6 +145,17 @@ export default function AdvisorManagementPage() {
     }
   }
 
+  async function copyReferralLink(advisor: Advisor, report?: ReferralReport) {
+    const url = report?.shareUrl ?? `https://www.brillara.gold/r/${encodeURIComponent(advisor.referralCode)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(advisor.id);
+      window.setTimeout(() => setCopiedId((current) => current === advisor.id ? null : current), 2_000);
+    } catch {
+      setError("No pudimos copiar el enlace. Puedes seleccionarlo y copiarlo manualmente.");
+    }
+  }
+
   if (loading) {
     return <main className="flex flex-1 items-center justify-center px-6 py-24 text-muted-foreground">Cargando equipo…</main>;
   }
@@ -166,7 +199,7 @@ export default function AdvisorManagementPage() {
               </Field>
               <Field label="Código de acceso" htmlFor="advisor-code">
                 <input id="advisor-code" value={form.code} onChange={(event) => setForm({ ...form, code: event.target.value })} autoComplete="username" minLength={3} maxLength={32} pattern="[A-Za-z0-9_-]+" className="input font-mono" placeholder="Ej.: 10001" required />
-                <p className="text-xs text-muted-foreground">Usa letras, números, guiones o guiones bajos.</p>
+                <p className="text-xs text-muted-foreground">Usa letras, números, guiones o guiones bajos. Al crear el asesor, este código también genera su enlace público permanente.</p>
               </Field>
               <Field label={editingId ? "Nueva contraseña (opcional)" : "Contraseña temporal"} htmlFor="advisor-password">
                 <div className="relative">
@@ -203,20 +236,29 @@ export default function AdvisorManagementPage() {
               </div>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
-                {advisors.map((advisor) => (
-                  <article key={advisor.id} className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5">
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted font-heading text-lg font-semibold text-primary">{advisor.name.slice(0, 1).toUpperCase()}</span>
-                      <span className="rounded-full border border-border bg-background px-2.5 py-1 font-mono text-xs font-medium text-muted-foreground">{advisor.code}</span>
-                    </div>
-                    <h3 className="mt-4 truncate font-heading text-xl font-semibold text-foreground" title={advisor.name}>{advisor.name}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">Creado: {displayDate(advisor.createdAt)}</p>
-                    <div className="mt-5 flex gap-2">
-                      <button type="button" onClick={() => startEditing(advisor)} className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full border border-border text-xs font-medium text-foreground transition-colors hover:bg-accent"><Pencil className="size-3.5" aria-hidden /> Editar</button>
-                      <button type="button" disabled={deletingId === advisor.id} onClick={() => deleteAdvisor(advisor)} className="inline-flex size-9 items-center justify-center rounded-full border border-destructive/20 bg-destructive/5 text-destructive transition-colors hover:bg-destructive/15 disabled:opacity-50" aria-label={`Eliminar a ${advisor.name}`} title="Eliminar asesor"><Trash2 className="size-3.5" aria-hidden /></button>
-                    </div>
-                  </article>
-                ))}
+                {advisors.map((advisor) => {
+                  const report = reports.find((item) => item.advisorId === advisor.id);
+                  const shareUrl = report?.shareUrl ?? `https://www.brillara.gold/r/${encodeURIComponent(advisor.referralCode)}`;
+                  return (
+                    <article key={advisor.id} className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted font-heading text-lg font-semibold text-primary">{advisor.name.slice(0, 1).toUpperCase()}</span>
+                        <span className="rounded-full border border-border bg-background px-2.5 py-1 font-mono text-xs font-medium text-muted-foreground">{advisor.code}</span>
+                      </div>
+                      <h3 className="mt-4 truncate font-heading text-xl font-semibold text-foreground" title={advisor.name}>{advisor.name}</h3>
+                      <p className="mt-1 text-xs text-muted-foreground">Creado: {displayDate(advisor.createdAt)}</p>
+                      <div className="mt-4 rounded-xl border border-border bg-muted/35 p-3">
+                        <div className="flex items-center justify-between gap-2"><span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Link2 className="size-3.5 text-primary" aria-hidden /> Enlace de referido</span><button type="button" onClick={() => copyReferralLink(advisor, report)} className="inline-flex h-7 items-center gap-1 rounded-full bg-background px-2.5 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"><Copy className="size-3" aria-hidden />{copiedId === advisor.id ? "Copiado" : "Copiar"}</button></div>
+                        <code className="mt-2 block truncate text-xs text-foreground" title={shareUrl}>{shareUrl}</code>
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs"><Metric label="Visitas" value={report?.uniqueVisitors ?? 0} icon={<MousePointerClick className="size-3" aria-hidden />} /><Metric label="Registrados" value={report?.registeredLeads ?? 0} icon={<UserCheck className="size-3" aria-hidden />} /><Metric label="Tickets" value={report?.ticketsCreated ?? 0} icon={<TicketCheck className="size-3" aria-hidden />} /><Metric label="Compras" value={report?.purchasesCompleted ?? 0} icon={<ShoppingBag className="size-3" aria-hidden />} /></div>
+                      <div className="mt-5 flex gap-2">
+                        <button type="button" onClick={() => startEditing(advisor)} className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full border border-border text-xs font-medium text-foreground transition-colors hover:bg-accent"><Pencil className="size-3.5" aria-hidden /> Editar</button>
+                        <button type="button" disabled={deletingId === advisor.id} onClick={() => deleteAdvisor(advisor)} className="inline-flex size-9 items-center justify-center rounded-full border border-destructive/20 bg-destructive/5 text-destructive transition-colors hover:bg-destructive/15 disabled:opacity-50" aria-label={`Eliminar a ${advisor.name}`} title="Eliminar asesor"><Trash2 className="size-3.5" aria-hidden /></button>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -236,4 +278,8 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor: string; c
       {children}
     </div>
   );
+}
+
+function Metric({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
+  return <div className="rounded-lg bg-muted/70 px-2.5 py-2"><p className="flex items-center gap-1 text-muted-foreground">{icon}{label}</p><p className="mt-1 font-heading text-lg font-semibold text-foreground">{value}</p></div>;
 }

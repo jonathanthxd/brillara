@@ -26,6 +26,8 @@ export interface Ticket {
   status: TicketStatus;
   advisorId: string | null;
   advisor: { code: string; name: string } | null;
+  referralAttributionId: string | null;
+  referrer: { code: string; name: string } | null;
   messages: TicketMessage[];
   createdAt: string;
   updatedAt: string;

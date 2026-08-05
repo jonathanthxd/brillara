@@ -22,7 +22,19 @@ export interface AdvisorSession {
   sessionVersion: number;
 }
 
-type SessionCookie = "brillara_visitor" | "brillara_admin" | "brillara_advisor";
+/**
+ * Attribution is deliberately kept apart from the visitor session. A client
+ * can arrive from a referral link before telling us their name, and the
+ * referral must survive until they create a negotiation.
+ */
+export interface ReferralSession {
+  attributionId: string;
+  advisorId: string;
+  advisorCode: string;
+  advisorName: string;
+}
+
+type SessionCookie = "brillara_visitor" | "brillara_admin" | "brillara_advisor" | "brillara_referral";
 
 interface SignedSession<T> {
   value: T;
@@ -31,6 +43,7 @@ interface SignedSession<T> {
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 const ONE_DAY = 60 * 60 * 24;
+const REFERRAL_WINDOW = 60 * 60 * 24 * 90;
 const DEVELOPMENT_SESSION_SECRET = "brillara-development-only-session-secret-change-before-production";
 let hasWarnedAboutDevelopmentSecret = false;
 
@@ -152,6 +165,20 @@ export function addTicketToVisitorSession(session: VisitorSession, ticketId: str
 
 export function clearVisitorSession(response: NextResponse): void {
   clearSession(response, "brillara_visitor");
+}
+
+export async function getReferralSession(): Promise<ReferralSession | null> {
+  const session = await getSession<ReferralSession>("brillara_referral");
+
+  if (!session || !session.attributionId || !session.advisorId || !session.advisorCode || !session.advisorName) {
+    return null;
+  }
+
+  return session;
+}
+
+export function setReferralSession(response: NextResponse, session: ReferralSession): void {
+  setSession(response, "brillara_referral", session, REFERRAL_WINDOW);
 }
 
 export async function getAdminSession(): Promise<AdminSession | null> {

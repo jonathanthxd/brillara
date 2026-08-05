@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/shared/Navbar";
 import { Footer } from "@/components/shared/Footer";
+import { ReferralCapture } from "@/components/shared/ReferralCapture";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -48,6 +49,7 @@ export default function RootLayout({
       className={cn("h-full antialiased", inter.variable, cormorant.variable)}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+        <ReferralCapture />
         <Navbar />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
