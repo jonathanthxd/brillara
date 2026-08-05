@@ -12,7 +12,7 @@ export async function GET() {
 
     const { data, error } = await getSupabaseAdmin()
       .from("tickets")
-      .select("*, advisors(code, name)")
+      .select("*, advisors(code, name), partners(name), partner_locations(name, city)")
       .order("created_at", { ascending: false });
 
     if (error) throw error;

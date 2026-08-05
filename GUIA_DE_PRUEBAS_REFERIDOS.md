@@ -2,11 +2,12 @@
 
 ## Antes de empezar
 
-1. En **Supabase → SQL Editor**, ejecuta las tres migraciones en este orden:
+1. En **Supabase → SQL Editor**, ejecuta las cuatro migraciones en este orden:
 
    1. `20260804_secure_brillara.sql`
    2. `20260805_advisor_management.sql`
    3. `20260805_referral_tracking.sql`
+   4. `20260806_partner_operations.sql`
 
 2. Despliega la versión nueva de la página o ejecútala localmente con las variables de Supabase configuradas.
 
@@ -32,7 +33,7 @@
    - En la parte superior, el panel debe mostrar: 1 visita única, 1 registrado y 1 ticket creado.
    - En **Personas conseguidas** debe aparecer `Cliente de prueba`.
 
-5. Cambia el estado del ticket a **Compra realizada**. El contador de compras realizadas debe subir a 1.
+5. No cambies el ticket directamente a **Compra realizada**: esa acción ahora está reservada al partner. Sigue la sección “Compra confirmada” de `GUIA_DE_PRUEBAS_PARTNERS.md`; cuando el partner confirme la compra, el contador de compras realizadas debe subir a 1.
 
 6. Entra como administrador en `/admin/asesores`.
 

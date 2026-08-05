@@ -29,11 +29,12 @@ pnpm dev
 
 `pnpm check:env` no muestra secretos: únicamente te dice qué variable falta o es inválida.
 
-Antes de probar tickets, asesores, anuncios o el panel de configuración, ejecuta estas dos migraciones en **Supabase → SQL Editor → New query → Run**, en este orden:
+Antes de probar tickets, asesores, anuncios, referidos o partners, ejecuta estas migraciones en **Supabase → SQL Editor → New query → Run**, en este orden:
 
 1. `supabase/migrations/20260804_secure_brillara.sql`
 2. `supabase/migrations/20260805_advisor_management.sql`
 3. `supabase/migrations/20260805_referral_tracking.sql`
+4. `supabase/migrations/20260806_partner_operations.sql`
 
 Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
 
@@ -49,6 +50,10 @@ Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de 
 - Se eliminó la página de prueba que exponía contraseñas de asesores.
 - Los ajustes y anuncios pasan a persistirse en Supabase, no en el `localStorage` del administrador.
 - Se añadieron validaciones de formularios, límites de fotos, estados de carga/error, cabeceras de seguridad y SEO básico.
+- Se añadió **Partners**: organizaciones, sucursales y usuarios individuales con acceso propio, sesiones HTTP-only y suspensión inmediata.
+- Los asesores ahora programan visitas con partner/sucursal; solo el partner certifica el resultado presencial mediante acciones controladas.
+- Las compras confirmadas se guardan de forma permanente, con pesos, pago, usuario confirmador, historial, correcciones auditadas y anulación sin borrado físico.
+- Las métricas de referido usan la compra confirmada no anulada como fuente principal y mantienen compatibilidad con tickets históricos ya marcados como compra realizada.
 
 ## Antes de desplegar
 
@@ -60,7 +65,9 @@ Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de 
 
    `supabase/migrations/20260805_referral_tracking.sql`
 
-   La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel. La tercera incorpora los enlaces de referido, sus métricas y la relación permanente entre cliente, referido y ticket.
+   `supabase/migrations/20260806_partner_operations.sql`
+
+   La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel. La tercera incorpora los enlaces de referido, sus métricas y la relación permanente entre cliente, referido y ticket. La cuarta agrega partners, sucursales, usuarios individuales, citas, compras y auditoría sin alterar los referidos existentes.
 
 2. En Vercel, configura estas variables de entorno para Production, Preview y Development:
 
@@ -97,6 +104,7 @@ Al registrar el nombre, BRILLARA crea una sesión firmada en una cookie `HttpOnl
 7. Edita el código o renueva la contraseña desde `/admin/asesores`; comprueba que el asesor puede entrar con el nuevo acceso. Si renuevas la contraseña, su sesión anterior se invalida.
 8. Elimina el asesor de prueba y confirma que ya no puede entrar; los tickets que tenía asignados deben quedar disponibles para el equipo.
 9. En Supabase, confirma que las tablas `tickets` y `advisors` no admiten consultas con el rol `anon`.
+10. Consulta `GUIA_DE_PRUEBAS_PARTNERS.md` para crear el primer partner y validar el flujo presencial completo.
 
 ## Enlaces de referido
 
@@ -111,7 +119,7 @@ El enlace oficial usa `/r/` porque llega al servidor desde el primer instante. T
 - La primera referencia válida queda asociada al navegador durante 90 días y no puede ser reemplazada por otro enlace posterior.
 - Al registrar su nombre, el cliente queda visible como un registro conseguido por ese asesor.
 - Al abrir un ticket, el origen queda guardado de forma permanente y el ticket se asigna automáticamente al asesor que lo refirió.
-- El panel del asesor muestra visitas únicas, registrados, tickets y compras realizadas. Administración ve estas métricas para cada asesor dentro de **Equipo de asesores**.
+- El panel del asesor muestra visitas únicas, registrados, tickets y compras realizadas. Una compra nueva se acredita cuando el partner la confirma; las compras históricas conservan el conteo por su estado anterior.
 - La atribución conserva el código y nombre históricos incluso si después se edita el código de acceso del asesor.
 
 Consulta `GUIA_DE_PRUEBAS_REFERIDOS.md` para hacer la prueba completa antes de usarlo con publicistas reales.
@@ -130,3 +138,11 @@ pnpm dev
 ```
 
 Las fotos continúan usando la columna existente de imágenes codificadas para preservar la compatibilidad con los tickets actuales. El formulario limita cada imagen a 2 MB y cuatro adjuntos. La siguiente mejora de infraestructura recomendada es moverlas a un bucket privado de Supabase Storage y guardar URLs firmadas.
+
+## Panel de partners
+
+El administrador crea primero el partner, luego al menos una sucursal y finalmente un usuario individual desde `/admin/partners`. Ese usuario entra en `/partner/login` con su código y contraseña personales. No existe una contraseña compartida para toda la joyería.
+
+Un asesor programa la visita desde el detalle de su ticket. El partner únicamente puede ver tickets asignados a su organización y, si su usuario está ligado a una sucursal, solo a esa sucursal. Desde el ticket puede confirmar una compra, registrar un resultado no concretado o enviar un problema a revisión; no tiene un selector libre de estados.
+
+La confirmación de compra se ejecuta como una función atómica de PostgreSQL: valida el usuario, la asignación y la cita; crea una sola compra por ticket; completa la cita; cierra el ticket; registra el evento; y preserva la atribución de referido. Las anulaciones no eliminan registros y excluyen la conversión de los reportes. Consulta `GUIA_DE_PRUEBAS_PARTNERS.md` antes de ponerlo en producción.

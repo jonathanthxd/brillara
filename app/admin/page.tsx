@@ -3,7 +3,7 @@
 import { api, ClientApiError } from "@/lib/client-api";
 import { STATUS_COLORS, STATUS_LABELS } from "@/lib/ticket-helpers";
 import { Ticket } from "@/types/ticket";
-import { ArrowUpRight, CalendarDays, Settings2, TicketCheck, UsersRound } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Settings2, Store, TicketCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -60,6 +60,7 @@ export default function AdminDashboard() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/admin/asesores" className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/30 transition-all hover:-translate-y-0.5 hover:brightness-110"><UsersRound className="size-4" aria-hidden /> Asesores</Link>
+            <Link href="/admin/partners" className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"><Store className="size-4" aria-hidden /> Partners</Link>
             <Link href="/admin/config" className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"><Settings2 className="size-4" aria-hidden /> Configuración</Link>
             <button onClick={logout} className="h-10 rounded-full border border-border px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent">Cerrar sesión</button>
           </div>

@@ -11,7 +11,7 @@ export async function GET() {
     const advisor = await requireActiveAdvisorSession();
     const { data, error } = await getSupabaseAdmin()
       .from("tickets")
-      .select("*, advisors(code, name)")
+      .select("*, advisors(code, name), partners(name), partner_locations(name, city)")
       .or(`advisor_id.is.null,advisor_id.eq.${advisor.id}`)
       .order("created_at", { ascending: false });
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       .eq("id", id)
       .is("advisor_id", null)
       .eq("status", "nuevo")
-      .select("*, advisors(code, name)")
+      .select("*, advisors(code, name), partners(name), partner_locations(name, city)")
       .maybeSingle();
 
     if (error) throw error;

@@ -22,6 +22,15 @@ export interface AdvisorSession {
   sessionVersion: number;
 }
 
+export interface PartnerSession {
+  id: string;
+  partnerId: string;
+  locationId: string | null;
+  name: string;
+  role: "owner" | "manager" | "buyer";
+  sessionVersion: number;
+}
+
 /**
  * Attribution is deliberately kept apart from the visitor session. A client
  * can arrive from a referral link before telling us their name, and the
@@ -34,7 +43,7 @@ export interface ReferralSession {
   advisorName: string;
 }
 
-type SessionCookie = "brillara_visitor" | "brillara_admin" | "brillara_advisor" | "brillara_referral";
+type SessionCookie = "brillara_visitor" | "brillara_admin" | "brillara_advisor" | "brillara_partner" | "brillara_referral";
 
 interface SignedSession<T> {
   value: T;
@@ -210,6 +219,29 @@ export function setAdvisorSession(response: NextResponse, session: AdvisorSessio
 
 export function clearAdvisorSession(response: NextResponse): void {
   clearSession(response, "brillara_advisor");
+}
+
+export async function getPartnerSession(): Promise<PartnerSession | null> {
+  const session = await getSession<PartnerSession>("brillara_partner");
+  if (
+    !session ||
+    !session.id ||
+    !session.partnerId ||
+    !session.name ||
+    !Number.isInteger(session.sessionVersion) ||
+    (session.role !== "owner" && session.role !== "manager" && session.role !== "buyer")
+  ) {
+    return null;
+  }
+  return session;
+}
+
+export function setPartnerSession(response: NextResponse, session: PartnerSession): void {
+  setSession(response, "brillara_partner", session, ONE_DAY);
+}
+
+export function clearPartnerSession(response: NextResponse): void {
+  clearSession(response, "brillara_partner");
 }
 
 export function passwordsMatch(input: string, expected: string): boolean {

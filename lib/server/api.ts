@@ -42,6 +42,17 @@ export function jsonError(error: unknown): NextResponse {
     ? String(error.message)
     : "";
 
+  // Partner RPCs intentionally raise concise, user-facing validation and
+  // authorization messages. Surface only those known application codes;
+  // unexpected database errors continue through the generic response below.
+  if (["22023", "P0002", "42501", "23505"].includes(databaseCode)) {
+    const status = databaseCode === "P0002" ? 404 : databaseCode === "42501" ? 403 : databaseCode === "23505" ? 409 : 400;
+    return NextResponse.json(
+      { error: databaseMessage || "No fue posible completar la operación." },
+      { status },
+    );
+  }
+
   if (process.env.NODE_ENV === "development" && /invalid api key|jwt|unauthorized/i.test(databaseMessage)) {
     console.error("Supabase authentication error");
     return NextResponse.json(

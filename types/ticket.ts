@@ -2,7 +2,10 @@ export type TicketStatus =
   | "nuevo" 
   | "en-negociacion" 
   | "cita-programada" 
+  | "pendiente-confirmacion"
   | "compra-realizada" 
+  | "no-concretado"
+  | "en-revision"
   | "cancelado" 
   | "archivado";
 
@@ -28,6 +31,11 @@ export interface Ticket {
   advisor: { code: string; name: string } | null;
   referralAttributionId: string | null;
   referrer: { code: string; name: string } | null;
+  partnerId: string | null;
+  partnerLocationId: string | null;
+  partner: { name: string } | null;
+  partnerLocation: { name: string; city: string | null } | null;
+  closedAt: string | null;
   messages: TicketMessage[];
   createdAt: string;
   updatedAt: string;

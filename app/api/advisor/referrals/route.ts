@@ -41,11 +41,7 @@ export async function GET() {
         .from("tickets")
         .select("id", { count: "exact", head: true })
         .eq("referrer_advisor_id", advisor.id),
-      supabase
-        .from("tickets")
-        .select("id", { count: "exact", head: true })
-        .eq("referrer_advisor_id", advisor.id)
-        .eq("status", "compra-realizada"),
+      supabase.rpc("advisor_referral_purchase_count", { p_advisor_id: advisor.id }),
       supabase
         .from("referral_attributions")
         .select("id, registered_name, registered_at, first_seen_at, last_seen_at")
@@ -69,7 +65,7 @@ export async function GET() {
           uniqueVisitors: countOrZero(visitsResult.count),
           registeredLeads: countOrZero(registrationsResult.count),
           ticketsCreated: countOrZero(ticketsResult.count),
-          purchasesCompleted: countOrZero(purchasesResult.count),
+          purchasesCompleted: countOrZero(typeof purchasesResult.data === "number" ? purchasesResult.data : Number(purchasesResult.data)),
           recentLeads: leads.map((lead) => ({
             id: String(lead.id),
             name: lead.registered_name,
