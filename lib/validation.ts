@@ -22,6 +22,27 @@ export function validatePassword(value: unknown): string {
   return string(value, "La contraseña", 1, 256);
 }
 
+export function validateAdvisorName(value: unknown): string {
+  return string(value, "El nombre del asesor", 2, 80);
+}
+
+export function validateAdvisorCode(value: unknown): string {
+  const code = string(value, "El código del asesor", 3, 32);
+  if (!/^[A-Za-z0-9_-]+$/.test(code)) {
+    throw new ApiError("El código solo puede incluir letras, números, guiones y guiones bajos.");
+  }
+  return code;
+}
+
+export function validateAdvisorPassword(value: unknown, required = true): string | null {
+  if ((value === undefined || value === null || value === "") && !required) return null;
+  const password = string(value, "La contraseña", 8, 256);
+  if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    throw new ApiError("La contraseña del asesor debe incluir letras y números.");
+  }
+  return password;
+}
+
 export function validateTicketInput(value: unknown) {
   if (!value || typeof value !== "object") {
     throw new ApiError("Los datos del ticket no son válidos.");

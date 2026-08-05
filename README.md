@@ -29,24 +29,35 @@ pnpm dev
 
 `pnpm check:env` no muestra secretos: únicamente te dice qué variable falta o es inválida.
 
-Antes de probar asesores, anuncios o el panel de configuración, pega el contenido de `supabase/migrations/20260804_secure_brillara.sql` en **Supabase → SQL Editor → New query → Run**. Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
+Antes de probar tickets, asesores, anuncios o el panel de configuración, ejecuta estas dos migraciones en **Supabase → SQL Editor → New query → Run**, en este orden:
+
+1. `supabase/migrations/20260804_secure_brillara.sql`
+2. `supabase/migrations/20260805_advisor_management.sql`
+
+Si falta ese paso, el proyecto mostrará un aviso claro en desarrollo en vez de un error genérico.
 
 ## Qué cambió en esta versión
 
 - La identificación del visitante se guarda en una cookie privada y firmada. Un navegador o ventana incógnita nueva siempre empieza en la pantalla “¿Cómo te llamas?”.
 - Los tickets, teléfonos, fotos, asesores y paneles ya no se consultan desde el navegador con Supabase.
 - Administración y asesores usan sesiones HTTP-only emitidas por el servidor.
+- El nombre se actualiza en el navbar al instante después del registro, sin exigir recargar la página.
+- El navbar ahora incluye navegación móvil, menú desplegable y selector de tema; el modo claro sigue siendo el predeterminado y el oscuro usa plata/azul.
+- El panel incluye **Asesores**: crear, editar nombre/código, renovar contraseña y eliminar accesos.
+- La eliminación libera los tickets del asesor y las contraseñas renovadas invalidan sus sesiones previas.
 - Se eliminó la página de prueba que exponía contraseñas de asesores.
 - Los ajustes y anuncios pasan a persistirse en Supabase, no en el `localStorage` del administrador.
 - Se añadieron validaciones de formularios, límites de fotos, estados de carga/error, cabeceras de seguridad y SEO básico.
 
 ## Antes de desplegar
 
-1. En Supabase, abre **SQL Editor** y ejecuta el archivo:
+1. En Supabase, abre **SQL Editor** y ejecuta estos archivos, en este orden:
 
    `supabase/migrations/20260804_secure_brillara.sql`
 
-   La migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`.
+   `supabase/migrations/20260805_advisor_management.sql`
+
+   La primera migración activa RLS y retira el acceso directo del navegador a `tickets` y `advisors`. La segunda migra de forma segura las contraseñas antiguas de asesores y habilita su administración desde el panel.
 
 2. En Vercel, configura estas variables de entorno para Production, Preview y Development:
 
@@ -79,9 +90,12 @@ Al registrar el nombre, BRILLARA crea una sesión firmada en una cookie `HttpOnl
 3. Abre otra ventana incógnita: no debe aparecer el nombre ni el ticket anterior.
 4. Inicia sesión en `/admin/login`, verifica que el ticket aparezca, responde y cambia el estado.
 5. En `/asesor/login`, comprueba que un asesor solo ve tickets nuevos o asignados a él.
-6. En Supabase, confirma que las tablas `tickets` y `advisors` no admiten consultas con el rol `anon`.
+6. En `/admin/asesores`, crea un asesor de prueba (por ejemplo, código `prueba01` y una contraseña con letras y números). Cierra el panel administrativo y entra en `/asesor/login` con esas credenciales. Debe abrir su panel de tickets.
+7. Edita el código o renueva la contraseña desde `/admin/asesores`; comprueba que el asesor puede entrar con el nuevo acceso. Si renuevas la contraseña, su sesión anterior se invalida.
+8. Elimina el asesor de prueba y confirma que ya no puede entrar; los tickets que tenía asignados deben quedar disponibles para el equipo.
+9. En Supabase, confirma que las tablas `tickets` y `advisors` no admiten consultas con el rol `anon`.
 
-La migración también genera hashes de las contraseñas de asesores y verifica sus credenciales únicamente dentro de la base de datos. Conserva la columna antigua temporalmente para poder revertir durante el despliegue; cuando el nuevo flujo lleve varios días estable, elimínala desde Supabase.
+La migración genera hashes de las contraseñas de asesores y verifica sus credenciales únicamente dentro de la base de datos. Tras convertir credenciales antiguas, borra el valor en texto plano de cada registro; si un asesor no recuerda su clave, simplemente restablécela desde el panel.
 
 ## Desarrollo
 

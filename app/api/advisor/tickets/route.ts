@@ -1,20 +1,14 @@
 import { ApiError, jsonError } from "@/lib/server/api";
-import { getAdvisorSession } from "@/lib/server/session";
+import { requireActiveAdvisorSession } from "@/lib/server/advisor-auth";
 import { getSupabaseAdmin } from "@/lib/server/supabase";
 import { DatabaseTicket, toTicket } from "@/lib/tickets";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-async function requireAdvisor() {
-  const advisor = await getAdvisorSession();
-  if (!advisor) throw new ApiError("No autorizado.", 401);
-  return advisor;
-}
-
 export async function GET() {
   try {
-    const advisor = await requireAdvisor();
+    const advisor = await requireActiveAdvisorSession();
     const { data, error } = await getSupabaseAdmin()
       .from("tickets")
       .select("*, advisors(code, name)")
@@ -34,7 +28,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const advisor = await requireAdvisor();
+    const advisor = await requireActiveAdvisorSession();
     const body = await request.json();
     const id = typeof body.id === "string" ? body.id : "";
     if (!id) throw new ApiError("El ticket no es válido.");

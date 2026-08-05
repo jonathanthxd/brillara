@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/lib/client-api";
+import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -26,15 +27,16 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center font-heading text-3xl font-bold text-foreground">Panel administrativo</h1>
-        <p className="mt-2 text-center text-muted-foreground">Acceso restringido</p>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <label className="sr-only" htmlFor="admin-password">Contraseña</label>
-          <input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="Contraseña" className="h-12 w-full rounded-xl border border-input bg-background px-4 text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20" />
-          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-          <button type="submit" disabled={loading || !password} className="h-12 w-full rounded-full bg-primary text-sm font-medium text-primary-foreground transition-all hover:brightness-110 disabled:opacity-50">{loading ? "Verificando…" : "Entrar"}</button>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_29rem)]" />
+      <div className="mx-auto w-full max-w-md rounded-[2rem] border border-border bg-card/90 p-6 shadow-2xl shadow-primary/10 backdrop-blur sm:p-8">
+        <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25"><ShieldCheck className="size-7" aria-hidden /></span>
+        <h1 className="mt-6 text-center font-heading text-3xl font-bold text-foreground">Panel administrativo</h1>
+        <p className="mt-2 text-center text-muted-foreground">Acceso restringido para la operación BRILLARA.</p>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <div className="space-y-2"><label className="text-sm font-medium text-foreground" htmlFor="admin-password">Contraseña</label><div className="relative"><LockKeyhole className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden /><input id="admin-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="Contraseña de administración" className="input pl-11" required /></div></div>
+          {error && <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
+          <button type="submit" disabled={loading || !password} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Verificando…" : <>Entrar al panel <ArrowRight className="size-4" aria-hidden /></>}</button>
         </form>
       </div>
     </main>

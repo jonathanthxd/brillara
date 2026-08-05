@@ -1,5 +1,5 @@
 import { ApiError, jsonError } from "@/lib/server/api";
-import { getAdvisorSession } from "@/lib/server/session";
+import { requireActiveAdvisorSession } from "@/lib/server/advisor-auth";
 import { getSupabaseAdmin } from "@/lib/server/supabase";
 import { DatabaseTicket, toTicket } from "@/lib/tickets";
 import { validateStatus } from "@/lib/validation";
@@ -11,15 +11,9 @@ interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-async function requireAdvisor() {
-  const advisor = await getAdvisorSession();
-  if (!advisor) throw new ApiError("No autorizado.", 401);
-  return advisor;
-}
-
 export async function GET(_request: NextRequest, context: RouteContext) {
   try {
-    const advisor = await requireAdvisor();
+    const advisor = await requireActiveAdvisorSession();
     const { id } = await context.params;
     const { data, error } = await getSupabaseAdmin()
       .from("tickets")
@@ -41,7 +35,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
-    const advisor = await requireAdvisor();
+    const advisor = await requireActiveAdvisorSession();
     const { id } = await context.params;
     const status = validateStatus((await request.json()).status);
     const { data, error } = await getSupabaseAdmin()

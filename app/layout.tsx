@@ -44,6 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={cn("h-full antialiased", inter.variable, cormorant.variable)}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">

@@ -19,9 +19,15 @@ export interface AdvisorSession {
   id: string;
   code: string;
   name: string;
+  sessionVersion: number;
 }
 
 type SessionCookie = "brillara_visitor" | "brillara_admin" | "brillara_advisor";
+
+interface SignedSession<T> {
+  value: T;
+  expiresAt: number;
+}
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 const ONE_DAY = 60 * 60 * 24;
@@ -82,7 +88,13 @@ function decode<T>(value: string | undefined): T | null {
 
 async function getSession<T>(cookieName: SessionCookie): Promise<T | null> {
   const cookieStore = await cookies();
-  return decode<T>(cookieStore.get(cookieName)?.value);
+  const session = decode<SignedSession<T>>(cookieStore.get(cookieName)?.value);
+
+  if (!session || !session.value || !Number.isFinite(session.expiresAt) || session.expiresAt <= Date.now()) {
+    return null;
+  }
+
+  return session.value;
 }
 
 function setSession<T>(
@@ -91,7 +103,12 @@ function setSession<T>(
   session: T,
   maxAge: number,
 ): void {
-  response.cookies.set(cookieName, encode(session as object), {
+  const signedSession: SignedSession<T> = {
+    value: session,
+    expiresAt: Date.now() + maxAge * 1_000,
+  };
+
+  response.cookies.set(cookieName, encode(signedSession), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -153,7 +170,7 @@ export function clearAdminSession(response: NextResponse): void {
 export async function getAdvisorSession(): Promise<AdvisorSession | null> {
   const session = await getSession<AdvisorSession>("brillara_advisor");
 
-  if (!session || !session.id || !session.code || !session.name) {
+  if (!session || !session.id || !session.code || !session.name || !Number.isInteger(session.sessionVersion)) {
     return null;
   }
 
